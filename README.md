@@ -5,7 +5,7 @@ A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "for
 Basically, it reads JSON files from a webserver in my home network (with little changes, fetching information from https-secured internet services should be no problem as well). It might seem as a detour but has three significant benefits:
 - I can easily gather and provide historical information
 - I can perfom calculations (average, sums, ...) in PHP with which I am way more comfortable as with C
-- I can dramatically reduce JSON file sizes (you should always check your JSON file sizes and initialize the DynamicJsonDocument with the correct size – this [tool](https://arduinojson.org/v6/assistant/) shold be helpful determining the right size)
+- I can dramatically reduce JSON file sizes (you should always check your JSON file sizes and initialize the ```DynamicJsonDocument``` with the correct size – this [tool](https://arduinojson.org/v6/assistant/) shold be helpful determining the right size)
 
 ## For now, it looks like this
 ### Screen 1
