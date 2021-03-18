@@ -2,6 +2,11 @@
 
 A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here. I built a little wifi-connected display to show the current Bitcoin value (alongside a 1-day and a 7-day trend comparision) as well as the current ranking of my podcast at Apple Podcasts. It's based on the NodeMCU (the WiFi version, obviously) and an Adafruit mini OLED display with 128x64 pixel screen size. I'm planning on displaying Covid-19-related information in my area as well.
 
+Basically, it reads JSON files from a webserver in my home network (with little changes, fetching information from https-secured internet services should be no problem as well). It might seem as a detour but has three significant benefits:
+- I can easily gather and provide historical information
+- I can perfom calculations (average, sums, ...) in PHP with which I am way more comfortable as programming in C
+- I can dramatically reduce JSON file sizes (you should always check your JSON file sizes and initialize the DynamicJsonDocument with the correct size – this [tool](https://arduinojson.org/v6/assistant/) shold be helpful determining the right size)
+
 ## For now, it looks like this
 ### Screen 1
 ![display](display-1.jpg)
