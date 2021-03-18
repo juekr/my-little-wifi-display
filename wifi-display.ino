@@ -81,7 +81,7 @@ DynamicJsonDocument fetchJson(String url, int docSize) {
 // bitcoin screen
 void page1() {
     // check how big your JSON doc ist here: https://arduinojson.org/v6/assistant/
-    DynamicJsonDocument doc = fetchJson("http://192.168.1.12/dash/btc.json.php", 500);
+    DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/bitcoin.json", 500);
     
     Serial.println("current BTC: " + doc["current"].as<String>());
     Serial.println("compared to average (1day): " + doc["compared"]["1day"].as<String>());
@@ -132,7 +132,7 @@ void page1() {
 
 // podcast chart screen
 void page2() {
-  DynamicJsonDocument doc = fetchJson("http://192.168.1.12/dash/podcast.json.php", 1536);
+  DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/podcast.json", 1536);
   
   int last_x = 4;
   int last_y = -1;
