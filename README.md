@@ -1,8 +1,9 @@
 # Yet another wifi display
 
-A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here.
+A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here. So basically I've built this:
 
-Have fun rebuilding or improving this – and don't forget to [let me know about it](https://twitter.com/MirUnauffaellig)!
+
+![components](display_components.png)
 
 Here's the full code:
 ```C++
@@ -202,6 +203,8 @@ void setup() {
   http.useHTTP10(true);
 }
 ```
+
+Have fun rebuilding or improving this – and don't forget to [let me know about it](https://twitter.com/MirUnauffaellig)!
 
 ## Licensing info
 
