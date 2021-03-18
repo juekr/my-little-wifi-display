@@ -2,7 +2,9 @@
 
 A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here. So basically I've built this:
 
+![display](display.png)
 
+## Components
 ![components](display_components.png)
 
 Here's the full code:
