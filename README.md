@@ -153,7 +153,7 @@ void page1() {
 
 // podcast chart screen
 void page2() {
-  DynamicJsonDocument doc = fetchJson("http://192.168.1.12/dash/podcast.json.php", 1536); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: http://itunes.apple.com/de/rss/toppodcasts/genre=1487/limit=100/json
+  DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/podcast.json", 1536); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: http://itunes.apple.com/de/rss/toppodcasts/genre=1487/limit=100/json
   
   int last_x = 4;
   int last_y = -1;
