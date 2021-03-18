@@ -1,8 +1,14 @@
 # Yet another wifi display
 
-A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here. So basically I've built this:
+A friend (I'm looking at you, [derphilipp](https://github.com/derphilipp)!) "forced" me to ut this up here. I built a little wifi-connected display to show the current Bitcoin value (alongside a 1-day and a 7-day trend comparision) as well as the current ranking of my podcast at Apple Podcasts. It's based on the NodeMCU (the WiFi version, obviously) and an Adafruit mini OLED display with 128x64 pixel screen size. I'm planning on displaying Covid-19-related information in my area as well.
 
-![display](display.jpg)
+For now, it looks like this:
+
+Screen 1:
+![display](display-1.jpg)
+
+Screen 2:
+![display](display-2.jpg)
 
 ## Components
 ![components](display_components.png)
