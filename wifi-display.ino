@@ -24,17 +24,19 @@ U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 HTTPClient http;
 String upArrow = "\x4c";
 String downArrow = "\x49";
-int screentime = 15 * 1000;
+int screentime = 12 * 1000;
 
 // main loop
 void loop(void) {
-  for (int i = 1; i < 5; i++) {
+  DynamicJsonDocument coronaInzidenz = fetchJson("http://192.168.x.y/covid.json", 2336);
+  for (int i = 1; i < 6; i++) {
     u8g2.clearDisplay();
     u8g2.clearBuffer();
     if (i == 1) { page1(); }
     if (i == 2) { page2(); }
-    if (i == 3) { page3(); }
-    if (i == 4) { page4(); i = 0; }
+    if (i == 3) { page3(coronaInzidenz, "Ansbach"); }
+    if (i == 4) { page3(coronaInzidenz, "Fuerth"); }
+    if (i == 5) { page3(coronaInzidenz, "Nuernberg"); i = 0; }
     u8g2.sendBuffer();
     delay(screentime);
   } 
@@ -81,7 +83,7 @@ DynamicJsonDocument fetchJson(String url, int docSize) {
 // bitcoin screen
 void page1() {
     // check how big your JSON doc ist here: https://arduinojson.org/v6/assistant/
-    DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/bitcoin.json", 500);
+    DynamicJsonDocument doc = fetchJson("http://192.168.x.y/btc.json", 500); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: https://www.bitcoin.de/de/api/marketplace
     
     Serial.println("current BTC: " + doc["current"].as<String>());
     Serial.println("compared to average (1day): " + doc["compared"]["1day"].as<String>());
@@ -132,7 +134,7 @@ void page1() {
 
 // podcast chart screen
 void page2() {
-  DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/podcast.json", 1536);
+  DynamicJsonDocument doc = fetchJson("http://192.168.x.y/podcast.json", 1536); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: http://itunes.apple.com/de/rss/toppodcasts/genre=1487/limit=100/json
   
   int last_x = 4;
   int last_y = -1;
@@ -151,15 +153,35 @@ void page2() {
   u8g2.setFont(u8g2_font_luRS18_tf); // u8g2_font_crox4hb_tr);
   u8g2.setCursor(0, 62);
   u8g2.print("Ach: " + doc["data_unsorted"][29].as<String>());
+  Serial.println("Ach: " + doc["data_unsorted"][29].as<String>());
 }
 
 // placeholders ... for now
-void page3() {
-  page1();
-}
+void page3(DynamicJsonDocument doc, String city) {
+  // Ansbach
+  u8g2.setFont(u8g2_font_crox4hb_tr);
+  u8g2.setCursor(2, 15);
+  u8g2.print(city);
 
-void page4() {
-  page2();
+  u8g2.setFont(u8g2_font_pxplusibmvga8_mf);
+  u8g2.setCursor(2, 28);
+  u8g2.print("Land:");
+  u8g2.setCursor(66, 28);
+  u8g2.print("Stadt:");
+  
+  u8g2.setFont(u8g2_font_logisoso28_tf); // u8g2_font_luRS18_tf); // u8g2_font_crox4hb_tr);
+    
+  String an = String(int(round(doc["current"]["current"]["LK " + city].as<float>())));
+  u8g2.setCursor(2, 62);
+  u8g2.print(an);
+  delay(20);
+  Serial.println(city + ": " + an);
+  an = String(int(round(doc["current"]["current"]["SK " + city].as<float>())));
+  Serial.println(city + " (Stadt): " + an);
+  u8g2.setCursor(66, 62);
+  u8g2.print(an); 
+  u8g2.drawLine(62, 20, 62, 64);
+  delay(20);
 }
 
 void setup() {
