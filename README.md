@@ -14,6 +14,9 @@ Basically, it reads JSON files from a webserver in my home network (with little 
 ### Screen 2
 ![display](display-2.jpg)
 
+### Screens 3-5 (sorry, no image)
+I displays the Covid-related numbers from the German RKI ("Inzidenzahlen") for the nearby cities and regions.
+
 ## Components
 ![components](display_components.png)
 
@@ -45,17 +48,19 @@ U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
 HTTPClient http;
 String upArrow = "\x4c";
 String downArrow = "\x49";
-int screentime = 15 * 1000;
+int screentime = 12 * 1000;
 
 // main loop
 void loop(void) {
-  for (int i = 1; i < 5; i++) {
+  DynamicJsonDocument coronaInzidenz = fetchJson("http://192.168.x.y/covid.json", 2336);
+  for (int i = 1; i < 6; i++) {
     u8g2.clearDisplay();
     u8g2.clearBuffer();
     if (i == 1) { page1(); }
     if (i == 2) { page2(); }
-    if (i == 3) { page3(); }
-    if (i == 4) { page4(); i = 0; }
+    if (i == 3) { page3(coronaInzidenz, "Ansbach"); }
+    if (i == 4) { page3(coronaInzidenz, "Fuerth"); }
+    if (i == 5) { page3(coronaInzidenz, "Nuernberg"); i = 0; }
     u8g2.sendBuffer();
     delay(screentime);
   } 
@@ -102,7 +107,7 @@ DynamicJsonDocument fetchJson(String url, int docSize) {
 // bitcoin screen
 void page1() {
     // check how big your JSON doc ist here: https://arduinojson.org/v6/assistant/
-    DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/bitcoin.json", 500); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: https://www.bitcoin.de/de/api/marketplace
+    DynamicJsonDocument doc = fetchJson("http://192.168.x.y/btc.json", 500); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: https://www.bitcoin.de/de/api/marketplace
     
     Serial.println("current BTC: " + doc["current"].as<String>());
     Serial.println("compared to average (1day): " + doc["compared"]["1day"].as<String>());
@@ -153,7 +158,7 @@ void page1() {
 
 // podcast chart screen
 void page2() {
-  DynamicJsonDocument doc = fetchJson("http://192.168.X.Y/podcast.json", 1536); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: http://itunes.apple.com/de/rss/toppodcasts/genre=1487/limit=100/json
+  DynamicJsonDocument doc = fetchJson("http://192.168.x.y/podcast.json", 1536); // I have my own "API" because I use this for different things, but you could make this work with an public API like this as well: http://itunes.apple.com/de/rss/toppodcasts/genre=1487/limit=100/json
   
   int last_x = 4;
   int last_y = -1;
@@ -172,15 +177,35 @@ void page2() {
   u8g2.setFont(u8g2_font_luRS18_tf); // u8g2_font_crox4hb_tr);
   u8g2.setCursor(0, 62);
   u8g2.print("Ach: " + doc["data_unsorted"][29].as<String>());
+  Serial.println("Ach: " + doc["data_unsorted"][29].as<String>());
 }
 
 // placeholders ... for now
-void page3() {
-  page1();
-}
+void page3(DynamicJsonDocument doc, String city) {
+  // Ansbach
+  u8g2.setFont(u8g2_font_crox4hb_tr);
+  u8g2.setCursor(2, 15);
+  u8g2.print(city);
 
-void page4() {
-  page2();
+  u8g2.setFont(u8g2_font_pxplusibmvga8_mf);
+  u8g2.setCursor(2, 28);
+  u8g2.print("Land:");
+  u8g2.setCursor(66, 28);
+  u8g2.print("Stadt:");
+  
+  u8g2.setFont(u8g2_font_logisoso28_tf); // u8g2_font_luRS18_tf); // u8g2_font_crox4hb_tr);
+    
+  String an = String(int(round(doc["current"]["current"]["LK " + city].as<float>())));
+  u8g2.setCursor(2, 62);
+  u8g2.print(an);
+  delay(20);
+  Serial.println(city + ": " + an);
+  an = String(int(round(doc["current"]["current"]["SK " + city].as<float>())));
+  Serial.println(city + " (Stadt): " + an);
+  u8g2.setCursor(66, 62);
+  u8g2.print(an); 
+  u8g2.drawLine(62, 20, 62, 64);
+  delay(20);
 }
 
 void setup() {
@@ -214,6 +239,25 @@ void setup() {
   
   http.useHTTP10(true);
 }
+```
+
+## Data
+
+In case you are wondering – my self-built JSON API (I guess it's a bit much to call it an API, but I'll do it anyway!) produces data like this:
+
+**Bitcoin**
+```json
+{"data":{"rawdata":["39539.65"],"1daydata":[],"7daydata":[]},"reversed":{"rawdata":["49285.99"]},"average":{"1day":"48.847,05","7day":"48.259,06","all":"43.690,66"},"compared":{"1day":"+","7day":"+","all":"+"},"current":"49.285,99"}
+```
+
+**Podcast**
+```json
+{"data":{"17.02.2021":"50","18.02.2021":"50","19.02.2021":"21","20.02.2021":"23","21.02.2021":"28","22.02.2021":"27","23.02.2021":"47","24.02.2021":"81","25.02.2021":"105","26.02.2021":"34","27.02.2021":"37","28.02.2021":"40","01.03.2021":"32","02.03.2021":"37","03.03.2021":"49","04.03.2021":"39","05.03.2021":"39","06.03.2021":"36","07.03.2021":"51","08.03.2021":"55","09.03.2021":"41","10.03.2021":"43","11.03.2021":"48","12.03.2021":"69","13.03.2021":"34","14.03.2021":"29","15.03.2021":"32","16.03.2021":"56","17.03.2021":"77","18.03.2021":"112"},"data_unsorted":["50","50","21","23","28","27","47","81","105","34","37","40","32","37","49","39","39","36","51","55","41","43","48","69","34","29","32","56","77","112"]}
+```
+
+**Covid**
+```json
+{"data":{"rawdata":{"LK Ansbach":["89.3868065073595"],"SK Ansbach":["90.9134408344897"],"LK Fuerth":["120.489083858705"],"SK Fuerth":["150.198059098656"],"LK Nuernberg":[0],"SK Nuernberg":["134.267029341976"]},"datedata":{"LK Ansbach":{"17.03.2021":"89.3868065073595","18.03.2021":"96.4294033836969","19.03.2021":"95.3459269411835"},"SK Ansbach":{"17.03.2021":"90.9134408344897","18.03.2021":"62.2039332025456","19.03.2021":"62.2039332025456"},"LK Fuerth":{"17.03.2021":"120.489083858705","19.03.2021":"106.064334382663"},"SK Fuerth":{"17.03.2021":"150.198059098656","18.03.2021":"146.30691767123","19.03.2021":"134.633493388951"},"LK Nuernberg":{"19.03.2021":0},"SK Nuernberg":{"17.03.2021":"134.267029341976","18.03.2021":"127.515095395181","19.03.2021":"147.192160040126"}},"1daydata":{"LK Ansbach":[],"SK Ansbach":[],"LK Fuerth":[],"SK Fuerth":[],"LK Nuernberg":[],"SK Nuernberg":[]},"7daydata":{"LK Ansbach":[],"SK Ansbach":[],"LK Fuerth":[],"SK Fuerth":[],"LK Nuernberg":[],"SK Nuernberg":[]}},"reversed":{"rawdata":{"LK Ansbach":["95.3459269411835"],"SK Ansbach":["62.2039332025456"],"LK Fuerth":["106.064334382663"],"SK Fuerth":["134.633493388951"],"LK Nuernberg":[0],"SK Nuernberg":["147.192160040126"]}},"average":{"1day":{"LK Ansbach":93.72071227741328,"SK Ansbach":71.7737690798603,"LK Fuerth":113.276709120684,"SK Fuerth":143.71282338627898,"LK Nuernberg":0,"SK Nuernberg":136.32476159242768},"7day":{"LK Ansbach":93.72071227741328,"SK Ansbach":71.7737690798603,"LK Fuerth":113.276709120684,"SK Fuerth":143.71282338627898,"LK Nuernberg":0,"SK Nuernberg":136.32476159242768},"all":{"LK Ansbach":93.72071227741328,"SK Ansbach":71.7737690798603,"LK Fuerth":113.276709120684,"SK Fuerth":143.71282338627898,"LK Nuernberg":0,"SK Nuernberg":136.32476159242768}},"compared":{"1day":{"LK Ansbach":"+","SK Ansbach":"-","LK Fuerth":"-","SK Fuerth":"-","LK Nuernberg":"-","SK Nuernberg":"+"},"7day":{"LK Ansbach":"+","SK Ansbach":"-","LK Fuerth":"-","SK Fuerth":"-","LK Nuernberg":"-","SK Nuernberg":"+"},"all":{"LK Ansbach":"+","SK Ansbach":"-","LK Fuerth":"-","SK Fuerth":"-","LK Nuernberg":"-","SK Nuernberg":"+"}},"current":{"current":{"LK Ansbach":"95.3459269411835","SK Ansbach":"62.2039332025456","LK Fuerth":"106.064334382663","SK Fuerth":"134.633493388951","LK Nuernberg":0,"SK Nuernberg":"147.192160040126"}}}
 ```
 
 Have fun rebuilding or improving this – and don't forget to [let me know about it](https://twitter.com/MirUnauffaellig)!
